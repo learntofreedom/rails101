@@ -4,6 +4,8 @@ class GroupsController < ApplicationController
      def index
     @groups = Group.all
   end
+
+
   def show
      @group = Group.find(params[:id])
      @posts = @group.posts.recent.paginate(:page => params[:page], :per_page => 5)
@@ -12,6 +14,17 @@ class GroupsController < ApplicationController
    def edit
   end
 
+  def create
+      @group = Group.new(group_params)
+      @group.user = current_user
+
+    if @group.save
+       current_user.join!(@group)
+      redirect_to groups_path
+      else
+      render :new
+    end
+end
   def update
 
     if @group.update(group_params)
@@ -64,5 +77,4 @@ def find_group_and_check_permission
   def group_params
     params.require(:group).permit(:title, :description)
   end
-
 end
